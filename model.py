@@ -5,47 +5,35 @@ class CNN(nn.Module):
     def __init__(self):
         super(CNN, self).__init__()
         self.model = nn.Sequential(
-            nn.Conv2d(3, 1, 1, 1, 1),  # [1, 512, 512]
-            nn.Conv2d(1, 64, 1, 1, 1),  # [64, 512, 512]
-            nn.BatchNorm2d(64),
+            nn.Conv2d(3, 1, 1, 1, 1),  # [1, 128, 128]
+            nn.Conv2d(1, 16, 1, 1, 1),  # [16, 128, 128]
             nn.ReLU(),
-            nn.Conv2d(64, 64, 3, 1, 0),  # [64, 510, 510]
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [64, 260, 260]
+            nn.MaxPool2d(2, 2, 0),  # [16, 64, 64]
             nn.ReLU(),
             nn.Dropout(),
 
-            nn.Conv2d(64, 32, 3, 1, 0),  # [32, 208, 208]
-            nn.Conv2d(32, 32, 3, 1, 0),  # [32, 206, 206]
-            nn.BatchNorm2d(32),
+            nn.Conv2d(16, 32, 3, 1, 0),  # [16, 62, 62]
+            nn.Conv2d(32, 32, 3, 1, 0),  # [32, 60, 60]
             nn.ReLU(),
-            nn.Conv2d(32, 32, 3, 1, 0),  # [32, 204, 204]
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [32, 102, 102]
+            nn.MaxPool2d(2, 2, 0),  # [32, 30, 30]
             nn.ReLU(),
             nn.Dropout(),
 
-            nn.Conv2d(32, 16, 3, 1, 0),  # [16, 100, 100]
+            nn.Conv2d(32, 16, 3, 1, 0),  # [16, 28, 28]
             nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [16, 50, 50]
-            nn.BatchNorm2d(16),
+            nn.MaxPool2d(2, 2, 0),  # [16, 14, 14]
             nn.ReLU(),
-            nn.Conv2d(16, 16, 3, 1, 0),  # [16, 48, 48]
-            nn.ReLU(),
-            nn.MaxPool2d(2, 2, 0),  # [16, 24, 24]
+            nn.Conv2d(16, 8, 3, 1, 0),  # [8, 12, 12]
             nn.ReLU(),
             nn.Dropout()
         )
 
         self.fc = nn.Sequential(
             nn.Flatten(),
-            nn.Linear(16 * 12 * 12, 1024),  # [2304, 1024]
+            nn.Linear(8 * 12 * 12, 144),
             nn.ReLU(),
-            nn.Linear(1024, 512),
-            nn.ReLU(),
-            nn.Linear(512, 128),
-            nn.ReLU(),
-            nn.Linear(128, 7)
+            nn.Linear(144, 7),
+            nn.Softmax()
         )
 
     def forward(self, x):
