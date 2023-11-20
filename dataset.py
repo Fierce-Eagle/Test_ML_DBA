@@ -30,17 +30,13 @@ def split_data(dataset):
 
 
 class CustomDataset(Dataset):
-    def __init__(self, data_frame, img_dir, transform=None):
+    def __init__(self, data_frame):
         """
         Класс обработки датасета
 
         :param data_frame: датасет вида pd.DataFrame({filename: , label: })
-        :param img_dir: путь до директории с изображениями
-        :param transform: аугментация
         """
-        self.img_dir = img_dir
         self.data_frame = data_frame
-        self.transform = transform
 
     def __len__(self):
         """
@@ -56,57 +52,65 @@ class CustomDataset(Dataset):
         :param idx: позиция картинки в датасете
         :return:
         """
-
-        return torch.Tensor(self.data_frame["image"][idx]), self.data_frame["label"][idx]
+        return self.data_frame["image"][idx], self.data_frame["label"][idx]
 
 
 def augmented_dataset(path, df_main):
     tmp_df = pd.DataFrame()
 
-    for image, label in zip(df_main['image'], df_main['label']):
+    for image_name, label in zip(df_main['image'], df_main['label']):
+        # [000] = 2186
+        # [001] = 545
+        # [010] = 2008
+        # [011] = 5
+        # [100] = 1226
+        # [101] = 8
+        # [110] = 22
+        # [111] = 0 - нет данных
         if label == '000':
-            label = 0
+            _label = 0
         elif label == '001':
-            label = 1
-        elif label == '001':
-            label = 2
+            _label = 1
+        elif label == '010':
+            _label = 2
         elif label == '011':
-            label = 3
+            _label = 3
         elif label == '100':
-            label = 4
+            _label = 4
         elif label == '101':
-            label = 5
+            _label = 5
         else:
-            label = 6
-        new_label = torch.Tensor([label])
+            _label = 6
+        new_label = torch.Tensor([_label])
 
-        img = Image.open(path + image)
+        img = Image.open(path + image_name)
         _img = np.array(img)
         img.close()
-
-        image_dict = test_augmentation(image=_img)
+        image_dict = resize_augmentation(image=_img)
         new_image = torch.Tensor(image_dict['image'])
         new_image = np.transpose(new_image, (2, 0, 1))
-
         tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
 
-        if label == 3:  # 5 * 40 = 200
+        if _label == 3:  # 5 * 40 = 200
             for i in range(40):
-                image_dict = train_augmentation(image=_img)
+
+                image_dict = new_image_augmentation(image=_img)
                 new_image = torch.Tensor(image_dict['image'])
                 new_image = np.transpose(new_image, (2, 0, 1))
                 tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
 
-        elif label == 5:  # 8 * 25 = 200
+        elif _label == 5:  # 8 * 25 = 200
             for i in range(25):
-                image_dict = train_augmentation(image=_img)
+
+                image_dict = new_image_augmentation(image=_img)
                 new_image = torch.Tensor(image_dict['image'])
                 new_image = np.transpose(new_image, (2, 0, 1))
                 tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
 
-        elif label == 6:  # 22 * 10 = 220
+        elif _label == 6:  # 22 * 10 = 220
             for i in range(10):
-                image_dict = train_augmentation(image=_img)
+
+                image_dict = new_image_augmentation(image=_img)
                 new_image = torch.Tensor(image_dict['image'])
                 new_image = np.transpose(new_image, (2, 0, 1))
                 tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
@@ -114,9 +118,9 @@ def augmented_dataset(path, df_main):
     return tmp_df
 
 
-train_augmentation = A.Compose([
+new_image_augmentation = A.Compose([
     # изменение размеров картинки
-    A.Resize(128, 128),
+    A.Resize(256, 256),
     # применяемые агументации
     A.HorizontalFlip(p=0.2),
     A.RandomBrightnessContrast(p=0.2),
@@ -124,9 +128,9 @@ train_augmentation = A.Compose([
     A.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ], p=1)
 
-test_augmentation = A.Compose([
+resize_augmentation = A.Compose([
     # изменение размеров картинки
-    A.Resize(128, 128),
+    A.Resize(256, 256),
     # нормализация
     A.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ], p=1)

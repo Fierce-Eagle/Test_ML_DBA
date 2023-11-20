@@ -46,8 +46,12 @@ def train_model(loader_train, loader_val, cnn_model, epochs=10, device=None, lr=
         loss_history.append(current_loss)
 
         y_pred_valid = test_model(model, loader_val, device)
+        y_pred_valid = torch.Tensor(y_pred_valid)
+        print(y_pred_valid)
+        #correct = torch.argmax(y_pred_valid, dim=0).eq(y_true_valid)
+        pred = torch.argmax(y_pred_valid, dim=1)
+        correct = pred.eq(y_true_valid)
 
-        correct = torch.argmax(y_pred_valid, dim=1).eq(y_true_valid)
         current_acc = torch.mean(correct.float())
 
         print('Epoch [%d/%d], loss = %.4f acc_val = %.4f' % (epoch, epochs, current_loss, current_acc))
