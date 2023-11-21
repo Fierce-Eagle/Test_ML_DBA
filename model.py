@@ -7,7 +7,6 @@ class CNN(nn.Module):
         self.model = nn.Sequential(
             nn.Conv2d(3, 1, 1, 1, 1),  # [1, 128, 128]
             nn.Conv2d(1, 8, 1, 1, 1),  # [8, 128, 128]
-            nn.BatchNorm2d(8),
             nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),  # [8, 64, 64]
             nn.ReLU(),
