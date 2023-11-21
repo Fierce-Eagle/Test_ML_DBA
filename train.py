@@ -49,8 +49,8 @@ def train_model(loader_train, loader_val, cnn_model, epochs=10, device=None, lr=
         y_pred_valid = torch.Tensor(y_pred_valid)
         print(y_pred_valid)
         #correct = torch.argmax(y_pred_valid, dim=0).eq(y_true_valid)
-        pred = torch.argmax(y_pred_valid, dim=1)
-        correct = pred.eq(y_true_valid)
+        pred = torch.argmax(y_pred_valid.long())
+        correct = pred.eq(torch.Tensor(y_true_valid))
 
         current_acc = torch.mean(correct.float())
 
@@ -58,9 +58,8 @@ def train_model(loader_train, loader_val, cnn_model, epochs=10, device=None, lr=
         if current_acc > best_acc:
             best_acc = current_acc
             best_model = model
-            best_y_valid = y_pred_valid
 
-    return loss_history, best_model, best_y_valid
+    return loss_history, best_model
 
 
 def test_model(model, loader_test, device=None):

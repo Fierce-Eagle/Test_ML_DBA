@@ -81,7 +81,7 @@ def augmented_dataset(path, df_main):
             _label = 5
         else:
             _label = 6
-        new_label = torch.Tensor([_label])
+        new_label = _label
 
         img = Image.open(path + image_name)
         _img = np.array(img)
@@ -91,24 +91,36 @@ def augmented_dataset(path, df_main):
         new_image = np.transpose(new_image, (2, 0, 1))
         tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
 
-        if _label == 3:  # 5 * 40 = 200
-            for i in range(40):
+        if _label == 1:
+            for i in range(3):
+                image_dict = new_image_augmentation(image=_img)
+                new_image = torch.Tensor(image_dict['image'])
+                new_image = np.transpose(new_image, (2, 0, 1))
+                tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
+
+        elif _label == 3:  # 5 * 400 = 2000
+            for i in range(400):
+                image_dict = new_image_augmentation(image=_img)
+                new_image = torch.Tensor(image_dict['image'])
+                new_image = np.transpose(new_image, (2, 0, 1))
+                tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
+
+        elif _label == 4:
+            image_dict = new_image_augmentation(image=_img)
+            new_image = torch.Tensor(image_dict['image'])
+            new_image = np.transpose(new_image, (2, 0, 1))
+            tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
+
+        elif _label == 5:  # 8 * 250 = 2000
+            for i in range(250):
 
                 image_dict = new_image_augmentation(image=_img)
                 new_image = torch.Tensor(image_dict['image'])
                 new_image = np.transpose(new_image, (2, 0, 1))
                 tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
 
-        elif _label == 5:  # 8 * 25 = 200
-            for i in range(25):
-
-                image_dict = new_image_augmentation(image=_img)
-                new_image = torch.Tensor(image_dict['image'])
-                new_image = np.transpose(new_image, (2, 0, 1))
-                tmp_df = pd.concat([tmp_df, pd.DataFrame({'image': [new_image], 'label': [new_label]})], ignore_index=True)
-
-        elif _label == 6:  # 22 * 10 = 220
-            for i in range(10):
+        elif _label == 6:  # 22 * 10 = 2200
+            for i in range(100):
 
                 image_dict = new_image_augmentation(image=_img)
                 new_image = torch.Tensor(image_dict['image'])
@@ -120,7 +132,7 @@ def augmented_dataset(path, df_main):
 
 new_image_augmentation = A.Compose([
     # изменение размеров картинки
-    A.Resize(256, 256),
+    A.Resize(128, 128),
     # применяемые агументации
     A.HorizontalFlip(p=0.2),
     A.RandomBrightnessContrast(p=0.2),
@@ -130,7 +142,7 @@ new_image_augmentation = A.Compose([
 
 resize_augmentation = A.Compose([
     # изменение размеров картинки
-    A.Resize(256, 256),
+    A.Resize(128, 128),
     # нормализация
     A.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
 ], p=1)
