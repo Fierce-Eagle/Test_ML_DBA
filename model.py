@@ -7,17 +7,16 @@ class CNN(nn.Module):
         self.model = nn.Sequential(
             nn.Conv2d(3, 1, 1, 1, 1),  # [1, 128, 128]
             nn.Conv2d(1, 16, 1, 1, 1),  # [16, 128, 128]
+            nn.BatchNorm2d(16),
             nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),  # [16, 64, 64]
             nn.ReLU(),
-            nn.Dropout(),
 
             nn.Conv2d(16, 32, 3, 1, 0),  # [32, 62, 62]
             nn.Conv2d(32, 64, 3, 1, 0),  # [64, 60, 60]
             nn.ReLU(),
             nn.MaxPool2d(2, 2, 0),  # [64, 30, 30]
             nn.ReLU(),
-            nn.Dropout(),
 
             nn.Conv2d(64, 16, 3, 1, 0),  # [16, 28, 28]
             nn.ReLU(),

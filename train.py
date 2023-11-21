@@ -21,7 +21,6 @@ def train_model(loader_train, loader_val, cnn_model, epochs=10, device=None, lr=
     for (_, labels) in loader_val:
         y_true_valid += [float(y.item()) for y in labels]
     y_true_valid = torch.Tensor(y_true_valid)
-    print(y_true_valid)
 
     for epoch in range(epochs):
         loss_sum = 0
@@ -37,22 +36,15 @@ def train_model(loader_train, loader_val, cnn_model, epochs=10, device=None, lr=
             loss.backward()
             optimizer.step()
 
-            # pred = torch.argmax(predicted_y, dim=1)
-            # correct = pred.eq(y)
             loss_sum += loss.item()
-            # acc_sum += torch.mean(correct.float())
 
-        # current_acc = acc_sum / batch_num
         current_loss = loss_sum / batch_num
         loss_history.append(current_loss)
 
         y_pred_valid = test_model(model, loader_val, device)
         y_pred_valid = torch.Tensor(y_pred_valid)
-        print(y_pred_valid)
-        #correct = torch.argmax(y_pred_valid, dim=0).eq(y_true_valid)
-        #pred = torch.argmax(y_pred_valid)
-        correct = y_pred_valid.eq(y_true_valid)
 
+        correct = y_pred_valid.eq(y_true_valid)
         current_acc = torch.mean(correct.float())
 
         print('Epoch [%d/%d], loss = %.4f acc_val = %.4f' % (epoch, epochs, current_loss, current_acc))
